@@ -8,6 +8,9 @@ ArrayList<Firework> fireworks;
 PVector gravity = new PVector(0, 0.2);
 
 final int background = 51;
+final int numExplodees = 100;
+final int seedWeight = 4;
+final int explodeeWeight = 2;
 
 OPC opc;
 
@@ -46,7 +49,7 @@ void setup() {
 
 void draw() {
   if (random(1) < 0.08) {
-    fireworks.add(new Firework());
+    fireworks.add(new Firework(seedWeight, explodeeWeight, numExplodees));
   }
   fill(background, 50);
   noStroke();

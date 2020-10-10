@@ -13,7 +13,9 @@ class Particle {
 
   float hu;
 
-  Particle(float x, float y, float h) {
+  int particleWeight;
+
+  Particle(float x, float y, float h, int seedWeight) {
     hu = h;
 
     acceleration = new PVector(0, 0);
@@ -21,15 +23,17 @@ class Particle {
     location =  new PVector(x, y);
     seed = true;
     lifespan = 255.0;
+    particleWeight = seedWeight;
   }
 
-  Particle(PVector l, float h) {
+  Particle(PVector l, float h, int explodeeWeight) {
     hu = h;
     acceleration = new PVector(0, 0);
     velocity = PVector.random2D();
     velocity.mult(random(4, 8));
     location = l.copy();
     lifespan = 255.0;
+    particleWeight = explodeeWeight;
   }
 
   void applyForce(PVector force) {
@@ -64,11 +68,7 @@ class Particle {
   // Method to display
   void display() {
     stroke(hu, 255, 255, lifespan);
-    if (seed) {
-      strokeWeight(4);
-    } else {
-      strokeWeight(2);
-    }
+    strokeWeight(particleWeight);
     point(location.x, location.y);
     //ellipse(location.x, location.y, 12, 12);
   }

@@ -12,10 +12,21 @@ class Firework {
   Particle firework;
   float hu;
 
+  int numExplodees;
+  int seedWeight;
+  int explodeeWeight;
+
   Firework() {
     hu = random(255);
-    firework = new Particle(random(width), height, hu);
+    firework = new Particle(random(width), height, hu, seedWeight);
     particles = new ArrayList<Particle>();   // Initialize the arraylist
+  }
+
+  Firework(int seedWeight, int explodeeWeight, int numExplodees) {
+    this();
+    this.seedWeight = seedWeight;
+    this.explodeeWeight = explodeeWeight;
+    this.numExplodees = numExplodees;
   }
 
   boolean done() {
@@ -34,8 +45,8 @@ class Firework {
       firework.display();
 
       if (firework.explode()) {
-        for (int i = 0; i < 100; i++) {
-          particles.add(new Particle(firework.location, hu));    // Add "num" amount of particles to the arraylist
+        for (int i = 0; i < numExplodees; i++) {
+          particles.add(new Particle(firework.location, hu, explodeeWeight));    // Add "num" amount of particles to the arraylist
         }
         firework = null;
       }
