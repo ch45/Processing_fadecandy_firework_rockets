@@ -27,6 +27,7 @@ class Firework {
     this.seedWeight = seedWeight;
     this.explodeeWeight = explodeeWeight;
     this.numExplodees = numExplodees;
+    this.firework.setWeight(seedWeight);
   }
 
   boolean done() {

@@ -81,4 +81,8 @@ class Particle {
       return false;
     }
   }
+
+  void setWeight(int particleWeight) {
+    this.particleWeight = particleWeight;
+  }
 }

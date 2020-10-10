@@ -7,10 +7,10 @@ ArrayList<Firework> fireworks;
 
 PVector gravity = new PVector(0, 0.2);
 
-final int background = 51;
-final int numExplodees = 100;
-final int seedWeight = 4;
-final int explodeeWeight = 2;
+final int background = 1;
+final int numExplodees = 30;
+final int seedWeight = 16;
+final int explodeeWeight = 8;
 
 OPC opc;
 
