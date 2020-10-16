@@ -37,7 +37,7 @@ void setup() {
 
   fireworks = new ArrayList<Firework>();
 
-  // Connect to the local instance of fcserver
+  // Connect to an instance of fcserver
   opc = new OPC(this, fcServerHost, fcServerPort);
   opc.showLocations(false);
 
@@ -78,6 +78,7 @@ void draw() {
 
   check_exit();
 }
+
 void apply_cmdline_args() {
 
   if (args == null) {
