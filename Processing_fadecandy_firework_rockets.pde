@@ -31,8 +31,8 @@ int deckXstart;
 int deckXend;
 int deckYlevel;
 
-int fireworkVelXMin = 5;
-int fireworkVelXMax = 12;
+float fireworkVelXMin;
+float fireworkVelXMax;
 
 void setup() {
 
@@ -64,6 +64,9 @@ void setup() {
   deckXstart = x0;
   deckXend = x0 + (int)(spacing * (boxesAcross * ledsAcross - 1));
   deckYlevel = y0 + (int)(spacing * (boxesDown * ledsDown - 1));
+
+  fireworkVelXMax = sqrt(2*gravity.y*(spacing * (boxesDown * ledsDown - 1)));
+  fireworkVelXMin = 0.5 * fireworkVelXMax;
 }
 
 void draw() {
