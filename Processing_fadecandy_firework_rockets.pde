@@ -27,6 +27,13 @@ int y0;
 
 int exitTimer = 0; // Run forever unless set by command line
 
+int deckXstart;
+int deckXend;
+int deckYlevel;
+
+int fireworkVelXMin = 5;
+int fireworkVelXMax = 12;
+
 void setup() {
 
   apply_cmdline_args();
@@ -53,6 +60,10 @@ void setup() {
       ledCount += ledsAcross * ledsDown;
     }
   }
+
+  deckXstart = x0;
+  deckXend = x0 + (int)(spacing * (boxesAcross * ledsAcross - 1));
+  deckYlevel = y0 + (int)(spacing * (boxesDown * ledsDown - 1));
 }
 
 void draw() {
@@ -63,7 +74,6 @@ void draw() {
   noStroke();
   rect(0,0,width,height);
   //background(255, 20);
-
 
   for (int i = fireworks.size()-1; i >= 0; i--) {
     Firework f = fireworks.get(i);

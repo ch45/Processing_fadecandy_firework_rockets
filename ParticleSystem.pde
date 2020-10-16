@@ -18,7 +18,9 @@ class Firework {
 
   Firework() {
     hu = random(255);
-    firework = new Particle(random(width), height, hu, seedWeight);
+    int launchX = deckXstart + (int)random(deckXend - deckXstart + 1);
+    int launchY = deckYlevel + seedWeight;
+    firework = new Particle(launchX, launchY, hu, seedWeight);
     particles = new ArrayList<Particle>();   // Initialize the arraylist
   }
 

@@ -19,7 +19,7 @@ class Particle {
     hu = h;
 
     acceleration = new PVector(0, 0);
-    velocity = new PVector(0, random(-12, -5));
+    velocity = new PVector(0, random(-fireworkVelXMax, -fireworkVelXMin));
     location =  new PVector(x, y);
     seed = true;
     lifespan = 255.0;
