@@ -1,7 +1,7 @@
+// Include code from:
 // Daniel Shiffman
 // http://codingtra.in
 // http://patreon.com/codingtrain
-// Code for:
 
 ArrayList<Firework> fireworks;
 
@@ -13,6 +13,8 @@ final int seedWeight = 16;
 final int explodeeWeight = 8;
 
 OPC opc;
+final String fcServerHost = "127.0.0.1";
+final int fcServerPort = 7890;
 
 final int boxesAcross = 2;
 final int boxesDown = 2;
@@ -23,14 +25,20 @@ float spacing;
 int x0;
 int y0;
 
+int exitTimer = 0; // Run forever unless set by command line
+
 void setup() {
+
+  apply_cmdline_args();
+
   size(640, 360, P2D);
-  fireworks = new ArrayList<Firework>();
   colorMode(HSB);
   background(background);
 
+  fireworks = new ArrayList<Firework>();
+
   // Connect to the local instance of fcserver
-  opc = new OPC(this, "127.0.0.1", 7890);
+  opc = new OPC(this, fcServerHost, fcServerPort);
   opc.showLocations(false);
 
   spacing = (float)min(height / (boxesDown * ledsDown + 1), width / (boxesAcross * ledsAcross + 1));
@@ -65,6 +73,37 @@ void draw() {
     }
   }
 
+  fill(128);
+  text(String.format("%5.1f fps", frameRate), 5, 15);
 
+  check_exit();
+}
+void apply_cmdline_args() {
 
+  if (args == null) {
+    return;
+  }
+
+  for (String exp: args) {
+    String[] comp = exp.split("=");
+    switch (comp[0]) {
+    case "exit":
+      exitTimer = parseInt(comp[1], 10);
+      println("exit after " + exitTimer + "s");
+      break;
+    }
+  }
+}
+
+void check_exit() {
+
+  if (exitTimer == 0) { // skip if not run from cmd line
+    return;
+  }
+
+  int m = millis();
+  if (m / 1000 >= exitTimer) {
+    println(String.format("average %.1f fps", (float)frameCount / exitTimer));
+    exit();
+  }
 }
