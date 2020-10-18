@@ -67,7 +67,12 @@ class Particle {
 
   // Method to display
   void display() {
-    stroke(hu, 255, 255, lifespan);
+    if (seed) {
+      float brightness = 255 - (255 - 32) * (fireworkVelXMax + velocity.y) / fireworkVelXMax;
+      stroke(hu, 0, brightness, lifespan);
+    } else {
+      stroke(hu, 255, 255, lifespan);
+    }
     strokeWeight(particleWeight);
     point(location.x, location.y);
     //ellipse(location.x, location.y, 12, 12);
