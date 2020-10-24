@@ -5,10 +5,10 @@
 
 ArrayList<Firework> fireworks;
 
-PVector gravity = new PVector(0, 0.2);
+final PVector gravity = new PVector(0, 0.2);
+final PVector resistance = new PVector(0.02, 0.0);
 
 final int background = 1;
-final int numExplodees = 50;
 final int seedWeight = 16;
 final int explodeeWeight = 8;
 
@@ -31,18 +31,49 @@ int deckXstart;
 int deckXend;
 int deckYlevel;
 
-float fireworkVelXMin;
-float fireworkVelXMax;
+float velocityYMin;
+float velocityYMax;
+
+ArrayList<LaunchControl> cntrlData;
+int cntrlDataIndex = 0;
+int startMillisecond = -1;
+int nextMillisecond = 0;
 
 void setup() {
 
   apply_cmdline_args();
 
   size(640, 360, P2D);
-  colorMode(HSB);
+  colorMode(HSB, 359, 255, 255);
   background(background);
 
   fireworks = new ArrayList<Firework>();
+
+  /*
+   * [duration] fireworks sequence (milliseconds), 0 = add to previous
+   * [deck position min] 0 - 100% (left to right)
+   * [deck position max] 0 - 100%, different values gives random min to max
+   * [launch angle] 0 - 180 degrees, -1 = random 60 to 120
+   * [launch velocity min] 0 - 100%
+   * [launch velocity max] 0 - 100%, different values gives random min to max
+   * [number to launch] N, -1, 0 = random 1 to 8
+   * [hue] colour wheel 0 - 360, -1 = random 0 to 359
+   * [number explodees] 50 - 500
+   */
+  cntrlData = new ArrayList<LaunchControl>();
+  cntrlData.add(new LaunchControl(2000, 10, 20, 105, 50, 100, 1, -1, 50));
+  cntrlData.add(new LaunchControl(2000, 80, 90, 75, 50, 100, 1, -1, 50));
+  cntrlData.add(new LaunchControl(2000, 10, 20, 105, 50, 95, 1, -1, 50));
+  cntrlData.add(new LaunchControl(0, 80, 90, 75, 50, 95, 1, -1, 50));
+  cntrlData.add(new LaunchControl(2000, 0, 45, 105, 50, 100, 3, -1, 50));
+  cntrlData.add(new LaunchControl(2000, 55, 100, 75, 50, 100, 3, -1, 50));
+  cntrlData.add(new LaunchControl(2000, 40, 60, 90, 75, 85, 1, -1, 500));
+  cntrlData.add(new LaunchControl(2000, 10, 90, 90, 50, 75, 8, -1, 80));
+  cntrlData.add(new LaunchControl(0, 10, 90, 90, 75, 95, 8, -1, 80));
+
+  //  for (LaunchControl cntrl: cntrlData) {
+  //    cntrl.dump();
+  //  }
 
   // Connect to an instance of fcserver
   opc = new OPC(this, fcServerHost, fcServerPort);
@@ -65,14 +96,49 @@ void setup() {
   deckXend = x0 + (int)(spacing * (boxesAcross * ledsAcross - 1));
   deckYlevel = y0 + (int)(spacing * (boxesDown * ledsDown - 1));
 
-  fireworkVelXMax = sqrt(2*gravity.y*(spacing * (boxesDown * ledsDown - 1)));
-  fireworkVelXMin = 0.5 * fireworkVelXMax;
+  velocityYMax = sqrt(2*gravity.y*(spacing * (boxesDown * ledsDown - 1)));
+  velocityYMin = 0.5 * velocityYMax;
 }
 
 void draw() {
-  if (random(1) < 0.08) {
-    fireworks.add(new Firework(seedWeight, explodeeWeight, numExplodees));
+
+  int m = millis();
+  if (startMillisecond == -1) {
+    startMillisecond = m;
   }
+
+  if ((m - startMillisecond) > nextMillisecond) {
+    int sequenceDuration = 0;
+    do {
+
+      LaunchControl cntrl = cntrlData.get(cntrlDataIndex++);
+      if (sequenceDuration == 0) {
+        sequenceDuration = cntrl.durationMilliS;
+      }
+
+      int count = cntrl.numLauched;
+      if (count <- 0) {
+        count = (int)(random(1, 9));
+      }
+
+      for (int x = 0; x < count; x++) {
+        fireworks.add(new Firework(cntrl));
+      }
+
+      if (cntrlDataIndex < cntrlData.size()) {
+        if (cntrlData.get(cntrlDataIndex).durationMilliS > 0) {
+          break;
+        }
+      }
+    } while (cntrlDataIndex < cntrlData.size());
+
+    if (cntrlDataIndex == cntrlData.size()) { // return to the start causing the whole sequence to loop
+      cntrlDataIndex = 0;
+    }
+
+    nextMillisecond += sequenceDuration;
+  }
+
   fill(background, 50);
   noStroke();
   rect(0,0,width,height);

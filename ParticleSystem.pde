@@ -10,25 +10,33 @@ class Firework {
 
   ArrayList<Particle> particles;    // An arraylist for all the particles
   Particle firework;
-  float hu;
-
+  int hue;
   int numExplodees;
-  int seedWeight;
-  int explodeeWeight;
 
   Firework() {
-    hu = random(255);
-    int launchX = deckXstart + (int)random(deckXend - deckXstart + 1);
-    int launchY = deckYlevel + seedWeight;
-    firework = new Particle(launchX, launchY, hu, seedWeight);
     particles = new ArrayList<Particle>();   // Initialize the arraylist
   }
 
-  Firework(int seedWeight, int explodeeWeight, int numExplodees) {
+  Firework(LaunchControl cntrl) {
     this();
-    this.seedWeight = seedWeight;
-    this.explodeeWeight = explodeeWeight;
-    this.numExplodees = numExplodees;
+
+    int deckMin = min(cntrl.deckPosMin, cntrl.deckPosMax);
+    int deckMax = max(cntrl.deckPosMax, cntrl.deckPosMin);
+    int deckPos = (deckMin == deckMax) ? deckMin : deckMin + (int)random(deckMax - deckMin + 1);
+    int launchX = deckXstart + deckPos * (deckXend - deckXstart) / 100;
+    int launchY = deckYlevel + seedWeight;
+    int angle = cntrl.launchAngle;
+    if (angle < 0 || angle > 180) {
+      angle = (int)random(60, 120 + 1);
+    }
+    int velMin = min(cntrl.launchVelMin, cntrl.launchVelMax);
+    int velMax = max(cntrl.launchVelMax, cntrl.launchVelMin);
+    int velPercent = (velMin == velMax) ? velMin : velMin + (int)random(velMax - velMin + 1);
+    float velocity = -(velocityYMin + velPercent * (velocityYMax - velocityYMin) / 100);
+    hue = (cntrl.hue >= 0) ? cntrl.hue : (int)random(360);
+    this.numExplodees = cntrl.numExplodees;
+
+    firework = new Particle(launchX, launchY, angle, velocity, hue);
     this.firework.setWeight(seedWeight);
   }
 
@@ -42,14 +50,15 @@ class Firework {
 
   void run() {
     if (firework != null) {
-      fill(hu,255,255);
+      fill(hue,255,255);
       firework.applyForce(gravity);
+      firework.applyWind(resistance);
       firework.update();
       firework.display();
 
       if (firework.explode()) {
         for (int i = 0; i < numExplodees; i++) {
-          particles.add(new Particle(firework.location, hu, explodeeWeight));    // Add "num" amount of particles to the arraylist
+          particles.add(new Particle(firework.location, hue));    // Add "num" amount of particles to the arraylist
         }
         firework = null;
       }
