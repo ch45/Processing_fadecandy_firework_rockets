@@ -22,10 +22,12 @@ final int ledsAcross = 8;
 final int ledsDown = 8;
 // initialized in setup()
 float spacing;
+
 int x0;
 int y0;
 
 int exitTimer = 0; // Run forever unless set by command line
+String filename = "data/default_rockets.csv";
 
 int deckXstart;
 int deckXend;
@@ -49,31 +51,13 @@ void setup() {
 
   fireworks = new ArrayList<Firework>();
 
-  /*
-   * [duration] fireworks sequence (milliseconds), 0 = add to previous
-   * [deck position min] 0 - 100% (left to right)
-   * [deck position max] 0 - 100%, different values gives random min to max
-   * [launch angle] 0 - 180 degrees, -1 = random 60 to 120
-   * [launch velocity min] 0 - 100%
-   * [launch velocity max] 0 - 100%, different values gives random min to max
-   * [number to launch] N, -1, 0 = random 1 to 8
-   * [hue] colour wheel 0 - 360, -1 = random 0 to 359
-   * [number explodees] 50 - 500
-   */
-  cntrlData = new ArrayList<LaunchControl>();
-  cntrlData.add(new LaunchControl(2000, 10, 20, 105, 50, 100, 1, -1, 50));
-  cntrlData.add(new LaunchControl(2000, 80, 90, 75, 50, 100, 1, -1, 50));
-  cntrlData.add(new LaunchControl(2000, 10, 20, 105, 50, 95, 1, -1, 50));
-  cntrlData.add(new LaunchControl(0, 80, 90, 75, 50, 95, 1, -1, 50));
-  cntrlData.add(new LaunchControl(2000, 0, 45, 105, 50, 100, 3, -1, 50));
-  cntrlData.add(new LaunchControl(2000, 55, 100, 75, 50, 100, 3, -1, 50));
-  cntrlData.add(new LaunchControl(2000, 40, 60, 90, 75, 85, 1, -1, 500));
-  cntrlData.add(new LaunchControl(2000, 10, 90, 90, 50, 75, 8, -1, 80));
-  cntrlData.add(new LaunchControl(0, 10, 90, 90, 75, 95, 8, -1, 80));
+  cntrlData = loadData(filename);
 
   //  for (LaunchControl cntrl: cntrlData) {
   //    cntrl.dump();
   //  }
+
+  // saveData(cntrlData, filename);
 
   // Connect to an instance of fcserver
   opc = new OPC(this, fcServerHost, fcServerPort);
@@ -117,7 +101,7 @@ void draw() {
       }
 
       int count = cntrl.numLauched;
-      if (count <- 0) {
+      if (count <= 0) {
         count = (int)(random(1, 9));
       }
 
@@ -167,6 +151,10 @@ void apply_cmdline_args() {
   for (String exp: args) {
     String[] comp = exp.split("=");
     switch (comp[0]) {
+    case "file":
+      filename = "data/" + comp[1];
+      println("use filename " + filename);
+      break;
     case "exit":
       exitTimer = parseInt(comp[1], 10);
       println("exit after " + exitTimer + "s");
