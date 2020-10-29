@@ -12,6 +12,7 @@ class Firework {
   Particle firework;
   int hue;
   int numExplodees;
+  Boolean alreadyExploded = false;
 
   Firework() {
     particles = new ArrayList<Particle>();   // Initialize the arraylist
@@ -42,6 +43,15 @@ class Firework {
 
   boolean done() {
     if (firework == null && particles.isEmpty()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  boolean exploded() {
+    if (firework == null && !alreadyExploded) {
+      alreadyExploded = true;
       return true;
     } else {
       return false;

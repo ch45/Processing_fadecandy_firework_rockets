@@ -3,6 +3,8 @@
 // http://codingtra.in
 // http://patreon.com/codingtrain
 
+import processing.sound.*;
+
 ArrayList<Firework> fireworks;
 
 final PVector gravity = new PVector(0, 0.2);
@@ -40,6 +42,8 @@ ArrayList<LaunchControl> cntrlData;
 int cntrlDataIndex = 0;
 int startMillisecond = -1;
 int nextMillisecond = 0;
+
+Pulse pulse;
 
 void setup() {
 
@@ -82,6 +86,10 @@ void setup() {
 
   velocityYMax = sqrt(2*gravity.y*(spacing * (boxesDown * ledsDown - 1)));
   velocityYMin = 0.5 * velocityYMax;
+
+  // Create and start the sine oscillator.
+  pulse = new Pulse(this);
+  pulse.amp(0.25);
 }
 
 void draw() {
@@ -133,6 +141,12 @@ void draw() {
     f.run();
     if (f.done()) {
       fireworks.remove(i);
+      pulse.stop();
+    }
+    if (f.exploded()) {
+      println("bang!");
+      //Start the Pulse Oscillator. 
+      pulse.play();
     }
   }
 
