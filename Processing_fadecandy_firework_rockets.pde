@@ -43,7 +43,9 @@ int cntrlDataIndex = 0;
 int startMillisecond = -1;
 int nextMillisecond = 0;
 
-Pulse pulse;
+// SoundFile array to hold samples
+SoundFile[] soundSamples;
+int soundTrackIndex = 0;
 
 void setup() {
 
@@ -87,9 +89,30 @@ void setup() {
   velocityYMax = sqrt(2*gravity.y*(spacing * (boxesDown * ledsDown - 1)));
   velocityYMin = 0.5 * velocityYMax;
 
-  // Create and start the sine oscillator.
-  pulse = new Pulse(this);
-  pulse.amp(0.25);
+  soundSamples = loadSoundData(dataPath(""), 24); // 24 track recording studio
+}
+
+// Create a new firework samples array and populate it with some samples
+SoundFile[] loadSoundData(String path, int tracks) {
+
+  ArrayList<SoundFile> samples = new ArrayList<SoundFile>();
+  String[] filenames = listFileNames(path);
+
+  while (tracks > 0) {
+    int start = tracks;
+    for (String name : filenames) {
+      if (name.matches("^.+\\.(wav|aif|aiff|mp3)$")) {
+        samples.add(new SoundFile(this, name));
+        if (--tracks == 0) {
+          break;
+        }
+      }
+    }
+    if (tracks == start) {
+      break;
+    }
+  }
+  return samples.toArray(new SoundFile[0]);
 }
 
 void draw() {
@@ -141,12 +164,17 @@ void draw() {
     f.run();
     if (f.done()) {
       fireworks.remove(i);
-      pulse.stop();
+      if (soundSamples.length != 0) {
+        soundSamples[f.getSoundTrack()].stop();
+      }
     }
     if (f.exploded()) {
-      println("bang!");
-      //Start the Pulse Oscillator. 
-      pulse.play();
+      if (soundSamples.length != 0) {
+        // Play next firework sample
+        f.setSoundTrack(soundTrackIndex);
+        soundSamples[soundTrackIndex].play();
+        soundTrackIndex = (soundTrackIndex + 1) % soundSamples.length;
+      }
     }
   }
 
@@ -187,5 +215,17 @@ void check_exit() {
   if (m / 1000 >= exitTimer) {
     println(String.format("average %.1f fps", (float)frameCount / exitTimer));
     exit();
+  }
+}
+
+// This function returns all the files in a directory as an array of Strings
+String[] listFileNames(String dir) {
+  File file = new File(dir);
+  if (file.isDirectory()) {
+    String names[] = file.list();
+    return names;
+  } else {
+    // If it's not a directory
+    return null;
   }
 }
