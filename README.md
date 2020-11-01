@@ -16,6 +16,12 @@
 * [launch velocity max] 0 - 100%, different values gives random min to max
 * [number to launch] N, -1, 0 = random 1 to 8
 * [hue] colour wheel 0 - 360, -1 = random 0 to 359
+    *   0 - red
+    *  60 - yellow
+    * 120 - green
+    * 180 - cyan
+    * 240 - blue
+    * 300 - purple
 * [number explodees] 50 - 500
 
 
